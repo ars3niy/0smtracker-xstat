@@ -143,10 +143,9 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 		// Bind WP count, TP count, start date, etc.
 		// Fill name-field only if empty (in case changed by user/restored by onRestoreInstanceState) 
 		Track t = Track.build(trackId, cursor, cr, true);
-		//TrackStatistics stat = ((TrackManager)getBaseContext()).getTrackStatistics(trackId);
-		TrackStatistics stat = DataHelper.getTrackStatistics(trackId, cr);
 
 		bindTrack(t);		
+		TrackStatistics stat = DataHelper.getTrackStatistics(trackId, cr);
 		
 		String from[] = new String[]{ITEM_KEY, ITEM_VALUE};
 		int[] to = new int[] {R.id.trackdetail_item_key, R.id.trackdetail_item_value};

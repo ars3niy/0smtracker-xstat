@@ -398,7 +398,7 @@ public class TrackManager extends ListActivity {
 
 		// set the active track
 		setActiveTrack(trackId);
-
+		
 		return trackId;
 	}
 	
@@ -455,7 +455,7 @@ public class TrackManager extends ListActivity {
 		// set the track active
 		ContentValues values = new ContentValues();
 		values.put(Schema.COL_ACTIVE, Schema.VAL_TRACK_ACTIVE);
-		getContentResolver().update(TrackContentProvider.CONTENT_URI_TRACK, values, Schema.COL_ID + " = ?", new String[]{Long.toString(trackId)});
+		getContentResolver().update(TrackContentProvider.CONTENT_URI_TRACK, values, Schema.COL_ID + " = ?", new String[] {Long.toString(trackId)});
 	}
 	
 	/**
@@ -478,5 +478,5 @@ public class TrackManager extends ListActivity {
 			
 		}
 	}
-
+	
 }

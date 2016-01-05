@@ -8,7 +8,6 @@ import java.lang.RuntimeException;
 import me.guillaumin.android.osmtracker.OSMTracker;
 import me.guillaumin.android.osmtracker.db.TrackContentProvider.Schema;
 import me.guillaumin.android.osmtracker.db.model.TrackStatistics;
-
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -387,7 +386,7 @@ public class DataHelper {
 	 */
 	public static TrackStatistics getTrackStatistics(long trackId, ContentResolver resolver) {
 		if (! tracksStatistics.containsKey(trackId))
-			tracksStatistics.put(trackId, new TrackStatistics(trackId, /*getContentResolver()*/resolver));
+			tracksStatistics.put(trackId, new TrackStatistics(trackId, resolver)); // getContentResolver() if non-static member
 		return tracksStatistics.get(trackId);
 	}
 

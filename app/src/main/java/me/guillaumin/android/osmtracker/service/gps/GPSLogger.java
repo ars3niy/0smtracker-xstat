@@ -356,11 +356,4 @@ public class GPSLogger extends Service implements LocationListener {
 		return isTracking;
 	}
 
-	/**
-	 * Getter for currentTrackId
-	 */
-	public long getCurrentTrackId() {
-		return currentTrackId;
-	}
-
 }

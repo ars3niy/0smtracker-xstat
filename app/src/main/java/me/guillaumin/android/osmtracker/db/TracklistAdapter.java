@@ -4,7 +4,6 @@ import me.guillaumin.android.osmtracker.R;
 import me.guillaumin.android.osmtracker.db.TrackContentProvider.Schema;
 import me.guillaumin.android.osmtracker.db.model.Track;
 import me.guillaumin.android.osmtracker.db.model.TrackStatistics;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -41,8 +40,11 @@ public class TracklistAdapter extends CursorAdapter {
 
 	public static String speedToString(float speed, Resources resources) {
 		float kmph = (float)3.6*speed;
-		if (kmph < 10)
+		if (kmph < 1)
 			return String.format("%.1g %s", kmph,
+					resources.getString(R.string.trackmgr_speed_kmph));
+		else if (kmph < 20)
+			return String.format("%.1f %s", kmph,
 					resources.getString(R.string.trackmgr_speed_kmph));
 		else
 			return String.format("%d %s", Math.round(kmph),
@@ -113,7 +115,6 @@ public class TracklistAdapter extends CursorAdapter {
 
 		// Bind WP count, TP count, name
 		Track t = Track.build(trackId, cursor, context.getContentResolver(), false);
-		//TrackStatistics stat = ((TrackManager) context).getTrackStatistics(trackId);
 		TrackStatistics stat = DataHelper.getTrackStatistics(trackId, context.getContentResolver());
 		vTps.setText(Integer.toString(t.getTpCount()));
 		vWps.setText(Integer.toString(t.getWpCount()));
