@@ -173,7 +173,7 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 		map = new HashMap<String, String>();
 		map.put(ITEM_KEY, getResources().getString(R.string.trackmgr_distance));
 		map.put(ITEM_VALUE, TracklistAdapter.distanceToString(stat.totalLength(), getResources()));
-		data.add(map);
+		trackData.add(map);
 
 		// Speed
 		map = new HashMap<String, String>();
@@ -182,7 +182,7 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 				getResources().getString(R.string.trackdetail_speed_average) + ", " +
 				TracklistAdapter.speedToString(stat.maximumSpeed(), getResources()) + " " +
 				getResources().getString(R.string.trackdetail_speed_max));
-		data.add(map);
+		trackData.add(map);
 
 		// Start date
 		map = new HashMap<String, String>();
