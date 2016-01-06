@@ -75,6 +75,11 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 	 * List with track info
 	 */
 	private ListView lv;
+
+	/**
+	 * Adapter for the above list
+	 */
+	TrackDetailSimpleAdapter adapter = null;
 	
 	/**
 	 * Observes changes on trackpoints
@@ -84,7 +89,7 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 	/**
 	 * Data for the track info
 	 */
-	private List<HashMap<String, String>> trackData = null;
+	private List<HashMap<String, String>> trackData = new ArrayList<HashMap<String, String>> ();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +130,10 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 				true, trackpointContentObserver);
 		// further work is done in onResume.
 	}
-	
+
+	/**
+	 * Update trackData (doesn't update the list view though)
+	 */
 	private void updateTrack() {
 		// Query the track values
 		ContentResolver cr = getContentResolver();
@@ -142,9 +150,6 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 			return;  // <--- Early return ---
 		}
 		
-		if (trackData == null)
-			// Don't expect this to happen but just in case 
-			return;
 		trackData.clear();
 
 		// Bind WP count, TP count, start date, etc.
@@ -236,12 +241,11 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 	protected void onResume() {
 		super.onResume();
 
-		trackData = new ArrayList<HashMap<String, String>>();
 		updateTrack();
 
 		String from[] = new String[]{ITEM_KEY, ITEM_VALUE};
 		int[] to = new int[] {R.id.trackdetail_item_key, R.id.trackdetail_item_value};
-		TrackDetailSimpleAdapter adapter = new TrackDetailSimpleAdapter(trackData, from, to);
+		adapter = new TrackDetailSimpleAdapter(trackData, from, to);
 		lv.setAdapter(adapter);
 
 		// Click on Waypoint count to see the track's WaypointList
@@ -318,7 +322,8 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 	private void pathChanged() {
 		updateTrack();
 		// Update the list view
-		lv.setAdapter(lv.getAdapter());
+		if (adapter != null)
+			adapter.notifyDataSetChanged();
 	}
 
 	/**
