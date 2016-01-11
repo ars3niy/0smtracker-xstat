@@ -87,6 +87,11 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 	private ContentObserver trackpointContentObserver;
 
 	/**
+	 * Statistics for the track
+	 */
+	private TrackStatistics trackStatistics;
+
+	/**
 	 * Data for the track info
 	 */
 	private List<HashMap<String, String>> trackData = new ArrayList<HashMap<String, String>> ();
@@ -94,6 +99,8 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState, R.layout.trackdetail, getIntent().getExtras().getLong(Schema.COL_TRACK_ID));
+		
+		trackStatistics = new TrackStatistics(trackId, getContentResolver());
 
 		lv = (ListView) findViewById(R.id.trackdetail_list);
 
@@ -155,9 +162,9 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 		// Bind WP count, TP count, start date, etc.
 		// Fill name-field only if empty (in case changed by user/restored by onRestoreInstanceState) 
 		Track t = Track.build(trackId, cursor, cr, true);
+		trackStatistics.update();
 
 		bindTrack(t);		
-		TrackStatistics stat = DataHelper.getTrackStatistics(trackId, cr);
 		
 		// Waypoint count
 		final int wpCount = t.getWpCount();
@@ -177,15 +184,15 @@ public class TrackDetail extends TrackDetailEditor implements AdapterView.OnItem
 		// Distance
 		map = new HashMap<String, String>();
 		map.put(ITEM_KEY, getResources().getString(R.string.trackmgr_distance));
-		map.put(ITEM_VALUE, TracklistAdapter.distanceToString(stat.totalLength(), getResources()));
+		map.put(ITEM_VALUE, TracklistAdapter.distanceToString(trackStatistics.totalLength(), getResources()));
 		trackData.add(map);
 
 		// Speed
 		map = new HashMap<String, String>();
 		map.put(ITEM_KEY, getResources().getString(R.string.trackdetail_speed));
-		map.put(ITEM_VALUE, TracklistAdapter.speedToString(stat.averageSpeed(), getResources()) + " " +
+		map.put(ITEM_VALUE, TracklistAdapter.speedToString(trackStatistics.averageSpeed(), getResources()) + " " +
 				getResources().getString(R.string.trackdetail_speed_average) + ", " +
-				TracklistAdapter.speedToString(stat.maximumSpeed(), getResources()) + " " +
+				TracklistAdapter.speedToString(trackStatistics.maximumSpeed(), getResources()) + " " +
 				getResources().getString(R.string.trackdetail_speed_max));
 		trackData.add(map);
 

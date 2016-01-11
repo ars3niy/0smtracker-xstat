@@ -21,7 +21,9 @@ public class TrackStatistics {
 	private double lastLatitude;
 	private double lastLongitude;
 	private long lastTime;
+	private int lastId;
 	private float timeMoving;
+	private ContentResolver contentResolver;
 	
 	private static double square(double x) {
 		return x*x;
@@ -63,38 +65,16 @@ public class TrackStatistics {
 	 */
 	public TrackStatistics (final long trackId, ContentResolver cr) {
 		this.trackId = trackId;
+		contentResolver = cr;
 		length = 0;
 		maxSpeed = 0;
 		pointCount = 0;
 		timeMoving = 0;
-
-		Cursor cursor = cr.query(TrackContentProvider.trackPointsUri(trackId), null, null, null, null);
-		if(! cursor.moveToFirst())
-			return;
-
-		while (! cursor.isAfterLast()) {
-			double latitude = cursor.getDouble(cursor.getColumnIndex(Schema.COL_LATITUDE));
-			double longitude = cursor.getDouble(cursor.getColumnIndex(Schema.COL_LONGITUDE));
-			float speed = cursor.getFloat(cursor.getColumnIndex(Schema.COL_SPEED));
-			float accuracy = cursor.getFloat(cursor.getColumnIndex(Schema.COL_ACCURACY));
-			long time = cursor.getLong(cursor.getColumnIndex(Schema.COL_TIMESTAMP));
-
-			update(latitude, longitude, accuracy, speed, time);
-			cursor.moveToNext();
-		}
-
-		cursor.close();
+		
+		update();
 	}
 
-	/**
-	 * Update the statistics upon adding a new point to the track
-	 */
-	public void update(Location trackPoint){
-		update(trackPoint.getLatitude(), trackPoint.getLongitude(), trackPoint.getAccuracy(),
-				trackPoint.getSpeed(), trackPoint.getTime());
-	}
-
-	private void update(double latitude, double longitude, float accuracy, float speed, long time) {
+	private void addPoint(double latitude, double longitude, float accuracy, float speed, long time, int point_id) {
 		if (pointCount > 0) {
 			// The "distance and time only counts when the speed is non-zero" principle has been borrowed from osmand
 			if ((speed > 0) && (time != 0) && (lastTime != 0)) {
@@ -109,6 +89,34 @@ public class TrackStatistics {
 		lastLatitude = latitude;
 		lastLongitude = longitude;
 		lastTime = time;
+		lastId = point_id;
+	}
+
+	/**
+	 * Update the statistics by reading new points from the database
+	 */
+	public void update() {
+		String selection = null;
+		if (pointCount > 0)
+			selection = Schema.COL_ID + " > " + String.valueOf(lastId);
+		Cursor cursor = contentResolver.query(TrackContentProvider.trackPointsUri(trackId), null, 
+				selection, null, null);
+		if(! cursor.moveToFirst())
+			return;
+
+		while (! cursor.isAfterLast()) {
+			double latitude = cursor.getDouble(cursor.getColumnIndex(Schema.COL_LATITUDE));
+			double longitude = cursor.getDouble(cursor.getColumnIndex(Schema.COL_LONGITUDE));
+			float speed = cursor.getFloat(cursor.getColumnIndex(Schema.COL_SPEED));
+			float accuracy = cursor.getFloat(cursor.getColumnIndex(Schema.COL_ACCURACY));
+			long time = cursor.getLong(cursor.getColumnIndex(Schema.COL_TIMESTAMP));
+			int id = cursor.getInt(cursor.getColumnIndex(Schema.COL_ID));
+
+			addPoint(latitude, longitude, accuracy, speed, time, id);
+			cursor.moveToNext();
+		}
+
+		cursor.close();
 	}
 
 	/**
