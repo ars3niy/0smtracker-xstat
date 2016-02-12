@@ -55,6 +55,8 @@ public class TrackStatistics {
 		this.trackId = trackId;
 		contentResolver = cr;
 		
+		// pointCount, length, maxSpeed and timeMoving are all implicitly initialized to  
+		// zero, which is what we need
 		update();
 	}
 
